@@ -1,13 +1,13 @@
 <?php
-include "../connex.php";
+include "../../connex.php";
 ?>
 <?php
 session_start();
-require_once '../config.php'; // ajout connexion bdd
+require_once '../../config.php'; // ajout connexion bdd
 // si la session existe pas soit si l'on est pas connecté on redirige
 if (!isset($_SESSION['user'])) {
-  header('Location:../index.php');
-  die();                                                                                      //importe le fichier de connexion à la base de données, vérifie si l'utilisateur et connecté ou non et ses droit admin ou membre
+  header('Location:../../index.php');
+  die();                             //importe le fichier de connexion à la base de données, vérifie si l'utilisateur et connecté ou non et ses droit admin ou membre
 }
 
 // On récupere les données de l'utilisateur
@@ -16,12 +16,32 @@ $req->execute(array($_SESSION['user']));
 $data = $req->fetch();
 
 if ($data['droit'] == 0) {
-  header('Location: ../index.php');
+  header('Location: ../../index.php');
   die();
 }
 if ($data['active'] == 1) {
-  header('Location: ../index.php');
+  header('Location: ../../index.php');
   die();
+}
+?>
+<?php
+function filter($choix)
+{
+    include "../../connex.php";
+    if (isset($_GET['sdate']) || isset($_GET['edate'])) {
+
+        $sdate = $_GET['sdate'];
+        $edate = $_GET['edate'];
+        $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol,sondetemp,gas,gas2 FROM sensor WHERE time BETWEEN ' $sdate ' AND ' $edate ' ORDER BY ID ASC");
+            while ($data = mysqli_fetch_array($sqlAdmin)) {
+                echo $data[$choix] . ',';
+            }
+        } else {
+        $sqlAdmin = mysqli_query($connexion, "SELECT * FROM (SELECT * FROM sensor ORDER BY id DESC LIMIT 30) time ORDER BY id ASC");
+        while ($data = mysqli_fetch_array($sqlAdmin)) {
+            echo $data[$choix] . ',';
+        }
+    }
 }
 ?>
 <!-- *****************************************************Création de la barre de navigation*********************************************************** -->
@@ -31,10 +51,10 @@ if ($data['active'] == 1) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="../globe.ico" />
+  <link rel="icon" href="../../globe.ico" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
-  <title>All data</title>
+  <title>Dashboard</title>
   <style>
     .bd-placeholder-img {
       font-size: 1.125rem;
@@ -50,7 +70,7 @@ if ($data['active'] == 1) {
       }
     }
   </style>
-  <link href="../assets/css/dashboard.css" rel="stylesheet">
+  <link href="../../assets/css/dashboard.css" rel="stylesheet">
 </head>
 
 <body>
@@ -71,13 +91,13 @@ if ($data['active'] == 1) {
           </h6>
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link" href="../dashboard/index.php">
+              <a class="nav-link" href="../../dashboard/index.php">
                 <span data-feather="home"></span>
                 Home
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="../jauge/jauge.php">
+              <a class="nav-link" aria-current="page" href="../../jauge/jauge.php">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-gauge">
                   <path d="M19.778,21.32C21.841,19.272 23,16.495 23,13.599C23,11.891 22.604,10.274 21.899,8.834" />
                   <path d="M19.024,5.198C17.118,3.626 14.669,2.68 12,2.68C5.929,2.68 1,7.573 1,13.599C1,16.495 2.159,19.272 4.222,21.32" />
@@ -89,7 +109,7 @@ if ($data['active'] == 1) {
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="../tableau/tableau.php">
+              <a class="nav-link active" href="../../tableau/tableau.php">
                 <span data-feather="bar-chart-2"></span>
                 Dashboard
               </a>
@@ -107,7 +127,7 @@ if ($data['active'] == 1) {
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="../camera/camera.php">
+                <a class="nav-link" href="../../camera/camera.php">
                   <span data-feather="camera"></span>
                   Webcams
                 </a>
@@ -124,20 +144,20 @@ if ($data['active'] == 1) {
                 </a>
               </h6>
               <ul class="nav flex-column mb-2">
-                <li class="nav-item">
-                  <a class="nav-link" href="../admin_dash/index.php">
+              <li class="nav-item">
+                  <a class="nav-link" href="../../admin_dash/index.php">
                     <span data-feather="users"></span>
                     Admin Panel Management
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="../utilisateur/change_pwd.php">
+                  <a class="nav-link" href="../../utilisateur/change_pwd.php">
                     <span data-feather="lock"></span>
                     Change your password
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="../utilisateur/inscription_admin.php">
+                  <a class="nav-link" href="../../utilisateur/inscription_admin.php">
                     <span data-feather="user-plus"></span>
                     New user
                   </a>
@@ -150,7 +170,7 @@ if ($data['active'] == 1) {
                   <strong><?php echo $data['pseudo']; ?></strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                  <li><a class="dropdown-item" href="../utilisateur/deconnexion.php">Sign out</a></li>
+                  <li><a class="dropdown-item" href="../../utilisateur/deconnexion.php">Sign out</a></li>
                 </ul>
               </div>
             </ul>
@@ -167,21 +187,22 @@ if ($data['active'] == 1) {
             </div>
             <div class="btn-group me-2">
               <a type="button" class="btn btn-sm btn-outline-secondary" onclick="Export()">Export to CSV file</a>
-              <a type="button" class="btn btn-sm btn-outline-secondary" href='../serreconnectee.sql'>Recover SQL</a>
+              <a type="button" class="btn btn-sm btn-outline-secondary" href='../../serreconnectee.sql'>Recover SQL</a>
             </div>
             <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
-              <a href='tableau.php' class='btn btn-sm btn-outline-secondary'>Home</a>
-              <a href='alldata.php' class='btn btn-sm btn-outline-secondary'>All data</a>
-              <a href='multichart.php' class='btn btn-sm btn-outline-secondary'>Multi Chart</a>
+              <a href='../tableau.php' class='btn btn-sm btn-outline-secondary'>Home</a>
+              <a href='../alldata.php' class='btn btn-sm btn-outline-secondary'>All data</a>
+              <a href='../multichart.php' class='btn btn-sm btn-outline-secondary'>Multi Chart</a>
+              <a class='btn btn-sm btn-outline-secondary' id="smooth">Smooth Chart</a>
               <div class="btn-group" role="group">
                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                   Select data sensor
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                  <li><a class="dropdown-item" href="../tableau/dropmenu/dropmenuTemp.php">Temperature</a></li>
-                  <li><a class="dropdown-item" href="../tableau/dropmenu/dropmenuHum.php">Humidity</a></li>
-                  <li><a class="dropdown-item" href="../tableau/dropmenu/dropmenuCO2.php">CO2</a></li>
-                  <li><a class="dropdown-item" href="../tableau/dropmenu/dropmenuO2.php">O2</a></li>
+                  <li><a class="dropdown-item" href="dropmenuTemp.php">Temperature</a></li>
+                  <li><a class="dropdown-item" href="dropmenuHum.php">Humidity</a></li>
+                  <li><a class="dropdown-item" href="dropmenuCO2.php">CO2</a></li>
+                  <li><a class="dropdown-item" href="dropmenuO2.php">O2</a></li>
                 </ul>
               </div>
             </div>
@@ -191,17 +212,31 @@ if ($data['active'] == 1) {
           function Export() {
             var conf = confirm("Export to CSV file ?");
             if (conf == true) {
-              window.open("export.php", '_blank');
+              window.open("../export.php", '_blank');
             }
           }
         </script>
         <div class="panel-body">
-          <div class="form-group">
-            <label class="col-md-2"></label>
-            <div class="col-md-8">
-              <a href='tableau.php' class='btn btn-light'>Go back</a>
+          <form class="form-horizontal" method="GET">
+            <div class="form-group">
+              <label class="col-md-2">From</label>
+              <div class="col-md-2">
+                <input type="date" name="sdate" class="form-control" value="<?php echo $sdate; ?>" required>
+              </div>
             </div>
-          </div>
+            <div class="form-group">
+              <label class="col-md-2">to</label>
+              <div class="col-md-2">
+                <input type="date" name="edate" class="form-control" value="<?php echo $edate; ?>" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-2"></label>
+              <div class="col-md-8">
+                <input type="submit" class="btn btn-primary" value="Filter">
+                <a href='tableau.php' class='btn btn-warning '>Reset</a>
+              </div>
+            </div>
           </form>
           <!-- ********************************************************************************************************************************************************************************************* -->
           <?php
@@ -211,78 +246,124 @@ if ($data['active'] == 1) {
             $edate = $_GET['edate'];
             $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol FROM sensor WHERE time BETWEEN ' $sdate ' AND ' $edate ' ORDER BY ID ASC");
           } else {
-            $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol FROM sensor ORDER BY ID ASC");
+            //$sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol FROM sensor ORDER BY ID DESC LIMIT 30");
+	    $sqlAdmin = mysqli_query($connexion, "SELECT * FROM (SELECT * FROM sensor ORDER BY id DESC LIMIT 30) time ORDER BY id ASC");
           }
           ?>
           <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js" integrity="sha512-GMGzUEevhWh8Tc/njS0bDpwgxdCJLQBWG3Z2Ct+JGOpVnEmjvNx6ts4v6A2XJf1HOrtOsfhv3hBKpK9kE5z8AQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-          <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.1.1/chartjs-plugin-zoom.min.js" integrity="sha512-NxlWEbNbTV6acWnTsWRLIiwzOw0IwHQOYUCKBiu/NqZ+5jSy7gjMbpYI+/4KvaNuZ1qolbw+Vnd76pbIUYEG8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
           <canvas id="myChart" width="900" height="380"></canvas>
           <script>
-            const labels = [<?php while ($data = mysqli_fetch_array($sqlAdmin)) {
-                              echo '"' . $data['time'] . '",';
-                            } ?>];
-            const data = {
-              labels: labels,
-              datasets: [{
-                label: 'All data Temperature DHT',
-                backgroundColor: [
-                            'rgba(0,123,255, .2)',
-                          ],
-                          borderColor: [
-                            'rgba(54, 162, 235, 1)',],
-                <?php
-                if (isset($_GET['sdate']) || isset($_GET['edate'])) {
 
-                  $sdate = $_GET['sdate'];
-                  $edate = $_GET['edate'];
-                  $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol FROM sensor WHERE time BETWEEN ' $sdate ' AND ' $edate ' ORDER BY ID ASC");
-                } else {
-                  $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol FROM sensor ORDER BY ID ASC");
+
+            let smooth = false;
+            const actions = [
+              {
+                handler(chart1) {
+                  smooth = !smooth;
+                  chart1.options.elements.line.tension = smooth ? 0.4 : 0;
+                  chart1.update();
+
                 }
+              }
+            ];
 
-                ?>
-                data: [<?php while ($data = mysqli_fetch_array($sqlAdmin)) {
-                          echo $data['temp'] . ',';
-                        } ?>],
-              }]
-            };
-            const config = {
+            actions.forEach((a, i) => {
+            const smooth = document.getElementById('smooth');
+            smooth.onclick = () => a.handler(myChart);
+            });
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myChart = new Chart(ctx, {
               type: 'line',
-              data: data,
+              data: {
+                labels: [<?php while ($data = mysqli_fetch_array($sqlAdmin)) {
+                            echo '"' . $data['time'] . '",';
+                          } ?>],
+                datasets: [
+                    {
+                  label: 'CO2',
+                  data: [<?php filter(gas); ?>],
+                  backgroundColor: [
+                    'rgba(190,190,190, .2)',
+                  ],
+                  borderColor: [
+                    'rgba(190, 190, 190, 1)',
+                  ],
+                  borderWidth: 1.5,
+                  hidden: false
+                }]
+              },
               options: {
-                plugins: {
-                  zoom: {
-                    zoom: {
-                      wheel: {
-                        enabled: true,
-                      },
-                      pinch: {
-                        enabled: true
-                      },
-                      mode: 'xy',
-                    }
+                scales: {
+                  x: {
+                    //reverse: true,
+                    ticks: {
+                          //minRotation: 70,
+                     }
+                  },
+                  y: {
+                    beginAtZero: false,
                   }
                 }
               }
-
-            };
-
-            const myChart = new Chart(
-              document.getElementById('myChart'),
-              config
-            );
+            });
           </script>
+          <!-- ********************************************************************************************************************************************************************************************* -->
+          <?php
+          if (isset($_GET['sdate']) || isset($_GET['edate'])) {
+
+            $sdate = $_GET['sdate'];
+            $edate = $_GET['edate'];
+            $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol,sondetemp,gas,gas2 FROM sensor WHERE time BETWEEN ' $sdate ' AND ' $edate ' ORDER BY ID DESC LIMIT 0,100");
+          } else {
+            $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol,sondetemp,gas,gas2 FROM sensor ORDER BY ID DESC LIMIT 0,100");
+          }
+
+          ?>
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                <th class='text-center'>ID</th>
+                <th class='text-center'>Date</th>
+                <th class='text-center'>Temperature (°C)</th>
+                <th class='text-center'>Humdity (%)</th> <!-- Création du tableau avec nom des colonnes -->
+                <th class='text-center'>Heat index (°C)</th>
+                <th class='text-center'>Soil Moisture Sensor (%)</th>
+                <th class='text-center'>Temperature Sensor Probe (°C)</th>
+                <th class='text-center'>CO2 (ppm)</th>
+                <th class='text-center'>O2 (%)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php
+                while ($data = mysqli_fetch_array($sqlAdmin)) {
+                  echo "<tr >
+<td><center>$data[id]</td>
+<td><center>$data[time]</center></td>
+<td><center>$data[temp]</td>
+<td><center>$data[hum]</td>
+<td><center>$data[hc]</td>
+<td><center>$data[humsol]</td>
+<td><center>$data[sondetemp]</td>
+<td><center>$data[gas]</td>
+<td><center>$data[gas2]</td>
+</tr>";
+                }
+                ?>
+              </tbody>
+            </table>
+          </div>
         </div>
+      </main>
     </div>
-    <script src="../assets/js/jquery.min.js"></script>
-    <script src="../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/feather.min.js"></script>
-    <script src="../assets/js/Chart.min.js"></script>
-    <script>
-      feather.replace()
-    </script>
+  </div>
+  <script src="../../assets/js/jquery.min.js"></script>
+  <script src="../../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../assets/js/feather.min.js"></script>
+  <script src="../../assets/js/Chart.min.js"></script>
+  <script>
+    feather.replace()
+  </script>
 </body>
 
 </html>

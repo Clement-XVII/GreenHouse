@@ -27,21 +27,21 @@ if ($data['active'] == 1) {
 <?php
 function filter($choix)
 {
-    include "../connex.php";
-    if (isset($_GET['sdate']) || isset($_GET['edate'])) {
+  include "../connex.php";
+  if (isset($_GET['sdate']) || isset($_GET['edate'])) {
 
-        $sdate = $_GET['sdate'];
-        $edate = $_GET['edate'];
-        $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol,sondetemp,gas,gas2 FROM sensor WHERE time BETWEEN ' $sdate ' AND ' $edate ' ORDER BY ID ASC");
-            while ($data = mysqli_fetch_array($sqlAdmin)) {
-                echo $data[$choix] . ',';
-            }
-        } else {
-        $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol,sondetemp,gas,gas2 FROM sensor ORDER BY ID DESC LIMIT 30");
-        while ($data = mysqli_fetch_array($sqlAdmin)) {
-            echo $data[$choix] . ',';
-        }
+    $sdate = $_GET['sdate'];
+    $edate = $_GET['edate'];
+    $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol,sondetemp,gas,gas2 FROM sensor WHERE time BETWEEN ' $sdate ' AND ' $edate ' ORDER BY ID ASC");
+    while ($data = mysqli_fetch_array($sqlAdmin)) {
+      echo $data[$choix] . ',';
     }
+  } else {
+    $sqlAdmin = mysqli_query($connexion, "SELECT * FROM (SELECT * FROM sensor ORDER BY id DESC LIMIT 30) time ORDER BY id ASC");
+    while ($data = mysqli_fetch_array($sqlAdmin)) {
+      echo $data[$choix] . ',';
+    }
+  }
 }
 ?>
 <!-- *****************************************************Création de la barre de navigation*********************************************************** -->
@@ -75,7 +75,7 @@ function filter($choix)
 
 <body>
   <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="https://github.com/Clement-XVII/Serre_connectee">Connected GreenHouse</a>
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="https://github.com/Clement-XVII/GreenHouse">Connected GreenHouse</a>
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -144,7 +144,7 @@ function filter($choix)
                 </a>
               </h6>
               <ul class="nav flex-column mb-2">
-              <li class="nav-item">
+                <li class="nav-item">
                   <a class="nav-link" href="../admin_dash/index.php">
                     <span data-feather="users"></span>
                     Admin Panel Management
@@ -187,8 +187,25 @@ function filter($choix)
             </div>
             <div class="btn-group me-2">
               <a type="button" class="btn btn-sm btn-outline-secondary" onclick="Export()">Export to CSV file</a>
+              <a type="button" class="btn btn-sm btn-outline-secondary" href='../serreconnectee.sql'>Recover SQL</a>
             </div>
-            <a type="button" class="btn btn-sm btn-outline-secondary " href='../serreconnectee.sql'>Recover SQL</a>
+            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+              <a href='tableau.php' class='btn btn-sm btn-outline-secondary'>Home</a>
+              <a href='alldata.php' class='btn btn-sm btn-outline-secondary'>All data</a>
+              <a href='multichart.php' class='btn btn-sm btn-outline-secondary'>Multi Chart</a>
+              <a class='btn btn-sm btn-outline-secondary' id="smooth">Smooth Chart</a>
+              <div class="btn-group" role="group">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                  Select data sensor
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                  <li><a class="dropdown-item" href="../tableau/dropmenu/dropmenuTemp.php">Temperature</a></li>
+                  <li><a class="dropdown-item" href="../tableau/dropmenu/dropmenuHum.php">Humidity</a></li>
+                  <li><a class="dropdown-item" href="../tableau/dropmenu/dropmenuCO2.php">CO2</a></li>
+                  <li><a class="dropdown-item" href="../tableau/dropmenu/dropmenuO2.php">O2</a></li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
         <script>
@@ -218,7 +235,6 @@ function filter($choix)
               <div class="col-md-8">
                 <input type="submit" class="btn btn-primary" value="Filter">
                 <a href='tableau.php' class='btn btn-warning '>Reset</a>
-                <a href='alldata.php' class='btn btn-light'>All data</a>
               </div>
             </div>
           </form>
@@ -230,12 +246,29 @@ function filter($choix)
             $edate = $_GET['edate'];
             $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol FROM sensor WHERE time BETWEEN ' $sdate ' AND ' $edate ' ORDER BY ID ASC");
           } else {
-            $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol FROM sensor ORDER BY ID DESC LIMIT 30");
+            //$sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol FROM sensor ORDER BY ID DESC LIMIT 30");
+            $sqlAdmin = mysqli_query($connexion, "SELECT * FROM (SELECT * FROM sensor ORDER BY id DESC LIMIT 30) time ORDER BY id ASC");
           }
           ?>
           <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
           <canvas id="myChart" width="900" height="380"></canvas>
           <script>
+            let smooth = false;
+            const actions = [
+              {
+                handler(chart1) {
+                  smooth = !smooth;
+                  chart1.options.elements.line.tension = smooth ? 0.4 : 0;
+                  chart1.update();
+                }
+              }
+            ];
+
+            actions.forEach((a, i) => {
+            const smooth = document.getElementById('smooth');
+            smooth.onclick = () => a.handler(myChart);
+            });
+
             var ctx = document.getElementById('myChart').getContext('2d');
             var myChart = new Chart(ctx, {
               type: 'line',
@@ -243,93 +276,99 @@ function filter($choix)
                 labels: [<?php while ($data = mysqli_fetch_array($sqlAdmin)) {
                             echo '"' . $data['time'] . '",';
                           } ?>],
-                datasets: [
-                    {
-                  label: 'Temperature',
-                  data: [<?php filter(temp); ?>],
-                  backgroundColor: [
-                    'rgba(255,0,0, .2)',
-                  ],
-                  borderColor: [
-                    'rgba(255, 0, 0, 1)',
-                  ],
-                  borderWidth: 1.5
-                },
-                {
-                  label: 'Temperature Sensor Probe',
-                  data: [<?php filter(sondetemp); ?>],
-                  backgroundColor: [
-                    'rgba(223,109,20, .2)',
-                  ],
-                  borderColor: [
-                    'rgba(223, 109, 20, 1)',
-                  ],
-                  borderWidth: 1.5,
-                  hidden: true
-                },
-                {
-                  label: 'Heat index',
-                  data: [<?php filter(hc); ?>],
-                  backgroundColor: [
-                    'rgba(200,0,255, .2)',
-                  ],
-                  borderColor: [
-                    'rgba(200, 0, 255, 1)',
-                  ],
-                  borderWidth: 1.5,
-                  hidden: true
-                },
-                {
-                  label: 'Humidity',
-                  data: [<?php filter(hum); ?>],
-                  backgroundColor: [
-                    'rgba(0,0,235, .2)',
-                  ],
-                  borderColor: [
-                    'rgba(0, 0, 235, 1)',
-                  ],
-                  borderWidth: 1.5,
-                  hidden: true
-                },
-                {
-                  label: 'Soil Moisture Sensor',
-                  data: [<?php filter(humsol); ?>],
-                  backgroundColor: [
-                    'rgba(0,128,128, .2)',
-                  ],
-                  borderColor: [
-                    'rgba(0, 128, 128, 1)',
-                  ],
-                  borderWidth: 1.5,
-                  hidden: true
-                },
-                {
-                  label: 'CO2',
-                  data: [<?php filter(gas); ?>],
-                  backgroundColor: [
-                    'rgba(190,190,190, .2)',
-                  ],
-                  borderColor: [
-                    'rgba(190, 190, 190, 1)',
-                  ],
-                  borderWidth: 1.5,
-                  hidden: true
-                },
-                {
-                  label: 'O2',
-                  data: [<?php filter(gas2); ?>],
-                  backgroundColor: [
-                    'rgba(204,80,125, .2)',
-                  ],
-                  borderColor: [
-                    'rgba(204, 80, 125, 1)',
-                  ],
-                  borderWidth: 1.5,
-                  hidden: true
-                }]
+                datasets: [{
+                    label: 'Temperature',
+                    data: [<?php filter(temp); ?>],
+                    backgroundColor: [
+                      'rgba(255,0,0, .2)',
+                    ],
+                    borderColor: [
+                      'rgba(255, 0, 0, 1)',
+                    ],
+                    borderWidth: 1.5
+                  },
+                  {
+                    label: 'Temperature Sensor Probe',
+                    data: [<?php filter(sondetemp); ?>],
+                    backgroundColor: [
+                      'rgba(223,109,20, .2)',
+                    ],
+                    borderColor: [
+                      'rgba(223, 109, 20, 1)',
+                    ],
+                    borderWidth: 1.5,
+                    hidden: true
+                  },
+                  {
+                    label: 'Heat index',
+                    data: [<?php filter(hc); ?>],
+                    backgroundColor: [
+                      'rgba(200,0,255, .2)',
+                    ],
+                    borderColor: [
+                      'rgba(200, 0, 255, 1)',
+                    ],
+                    borderWidth: 1.5,
+                    hidden: true
+                  },
+                  {
+                    label: 'Humidity',
+                    data: [<?php filter(hum); ?>],
+                    backgroundColor: [
+                      'rgba(0,0,235, .2)',
+                    ],
+                    borderColor: [
+                      'rgba(0, 0, 235, 1)',
+                    ],
+                    borderWidth: 1.5,
+                    hidden: true
+                  },
+                  {
+                    label: 'Soil Moisture Sensor',
+                    data: [<?php filter(humsol); ?>],
+                    backgroundColor: [
+                      'rgba(0,128,128, .2)',
+                    ],
+                    borderColor: [
+                      'rgba(0, 128, 128, 1)',
+                    ],
+                    borderWidth: 1.5,
+                    hidden: true
+                  },
+                  {
+                    label: 'CO2',
+                    data: [<?php filter(gas); ?>],
+                    backgroundColor: [
+                      'rgba(190,190,190, .2)',
+                    ],
+                    borderColor: [
+                      'rgba(190, 190, 190, 1)',
+                    ],
+                    borderWidth: 1.5,
+                    hidden: true
+                  },
+                  {
+                    label: 'O2',
+                    data: [<?php filter(gas2); ?>],
+                    backgroundColor: [
+                      'rgba(204,80,125, .2)',
+                    ],
+                    borderColor: [
+                      'rgba(204, 80, 125, 1)',
+                    ],
+                    borderWidth: 1.5,
+                    hidden: true
+                  }
+                ]
               },
               options: {
                 scales: {
+                  x: {
+                    //reverse: true,
+                    ticks: {
+                      //minRotation: 70,
+                    }
+                  },
                   y: {
                     beginAtZero: false,
                   }
@@ -353,15 +392,15 @@ function filter($choix)
             <table class="table table-bordered table-striped">
               <thead>
                 <tr>
-                <th class='text-center'>ID</th>
-                <th class='text-center'>Date</th>
-                <th class='text-center'>Temperature (°C)</th>
-                <th class='text-center'>Humdity (%)</th> <!-- Création du tableau avec nom des colonnes -->
-                <th class='text-center'>Heat index (°C)</th>
-                <th class='text-center'>Soil Moisture Sensor (%)</th>
-                <th class='text-center'>Temperature Sensor Probe (°C)</th>
-                <th class='text-center'>CO2 (ppm)</th>
-                <th class='text-center'>O2 (%)</th>
+                  <th class='text-center'>ID</th>
+                  <th class='text-center'>Date</th>
+                  <th class='text-center'>Temperature (°C)</th>
+                  <th class='text-center'>Humdity (%)</th> <!-- Création du tableau avec nom des colonnes -->
+                  <th class='text-center'>Heat index (°C)</th>
+                  <th class='text-center'>Soil Moisture Sensor (%)</th>
+                  <th class='text-center'>Temperature Sensor Probe (°C)</th>
+                  <th class='text-center'>CO2 (ppm)</th>
+                  <th class='text-center'>O2 (%)</th>
                 </tr>
               </thead>
               <tbody>
