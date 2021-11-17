@@ -1,5 +1,5 @@
 <?php
-include "connex.php"
+include "connex.php";
 if(isset($_GET["temp"])) {
    $temperature = $_GET["temp"]; // get temperature value from HTTP GET
    $humidity = $_GET["hum"];

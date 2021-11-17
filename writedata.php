@@ -1,5 +1,5 @@
 <?php
-include "connex.php"
+include "connex.php";
 // Create connection
 $connexion = mysqli_connect($host, $user, $pass, $database);
 // Check connection
