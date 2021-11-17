@@ -242,7 +242,6 @@ function filter($choix)
               <div class="col-md-8">
                 <input type="submit" class="btn btn-primary" value="Filter">
                 <a href='multichart.php' class='btn btn-warning'>Reset</a>
-                <a class='btn btn-light' id="smooth">Smooth Chart</a>
               </div>
             </div>
           </form>
