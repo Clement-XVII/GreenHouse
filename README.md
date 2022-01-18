@@ -1,4 +1,8 @@
-# GreenHouse
+
+<h1 align="center">
+  GreenHouse
+  <br>
+</h1>
 
 This is my connected greenhouse project for high school.
 
