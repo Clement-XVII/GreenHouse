@@ -1,6 +1,6 @@
 <?php
 // Database Connection
-require("../../connex.php");
+require("../connex.php");
 
 // get Users
 $query = "SELECT * FROM sensor";
@@ -18,7 +18,7 @@ if (mysqli_num_rows($result) > 0) {
 header('Content-Type: text/csv; charset=utf-8');
 header('Content-Disposition: attachment; filename=sensor.csv');
 $output = fopen('php://output', 'w');
-fputcsv($output, array('ID', 'Time', 'Temperature °C', 'Humidite %', 'Indice de temperature °C', 'Humidite du sol %', 'Sonde Temperature °C', 'CO2 %', 'O2 %'));
+fputcsv($output, array('ID', 'Time', 'Temperature °C', 'Humidite %', 'Indice de temperature'));
 
 if (count($sensor) > 0) {
     foreach ($sensor as $row) {

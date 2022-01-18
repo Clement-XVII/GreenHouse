@@ -3,11 +3,11 @@ include "../../connex.php";
 ?>
 <?php
 session_start();
-require_once '../../config.php'; // ajout connexion bdd 
+require_once '../../config.php'; // ajout connexion bdd
 // si la session existe pas soit si l'on est pas connecté on redirige
 if (!isset($_SESSION['user'])) {
   header('Location:../../index.php');
-  die();
+  die();                                                                                      //importe le fichier de connexion à la base de données, vérifie si l'utilisateur et connecté ou non et ses droit admin ou membre
 }
 
 // On récupere les données de l'utilisateur
@@ -15,19 +15,23 @@ $req = $bdd->prepare('SELECT * FROM utilisateurs WHERE token = ?');
 $req->execute(array($_SESSION['user']));
 $data = $req->fetch();
 
+if ($data['active'] == 1) {
+  header('Location: ../../index.php');
+  die();
+}
 ?>
 
 <?php
-$x_date  = mysqli_query($connexion, 'SELECT time FROM ( SELECT * FROM sensor ORDER BY id DESC LIMIT 20) Var1 ORDER BY ID ASC');
-$y_temp   = mysqli_query($connexion, 'SELECT temp FROM ( SELECT * FROM sensor ORDER BY id DESC LIMIT 20) Var1 ORDER BY ID ASC');
-$y_hum   = mysqli_query($connexion, 'SELECT hum FROM ( SELECT * FROM sensor ORDER BY id DESC LIMIT 20) Var1 ORDER BY ID ASC');
-$y_hc   = mysqli_query($connexion, 'SELECT hc FROM ( SELECT * FROM sensor ORDER BY id DESC LIMIT 20) Var1 ORDER BY ID ASC');
+$x_date  = mysqli_query($connexion, 'SELECT time FROM ( SELECT * FROM sensor ORDER BY id DESC LIMIT 30) Var1 ORDER BY ID ASC');
+$y_temp   = mysqli_query($connexion, 'SELECT temp FROM ( SELECT * FROM sensor ORDER BY id DESC LIMIT 30) Var1 ORDER BY ID ASC');
+$y_sondetemp   = mysqli_query($connexion, 'SELECT sondetemp FROM ( SELECT * FROM sensor ORDER BY id DESC LIMIT 30) Var1 ORDER BY ID ASC');
+$y_hc   = mysqli_query($connexion, 'SELECT hc FROM ( SELECT * FROM sensor ORDER BY id DESC LIMIT 30) Var1 ORDER BY ID ASC');
 ?>
 
 <div class="panel panel-primary">
   <div class="panel-heading">
     <h3 class="panel-title">
-      <center>Graphique Température
+      <center>Live Temperature Graph
     </h3>
   </div>
 
@@ -40,7 +44,7 @@ $y_hc   = mysqli_query($connexion, 'SELECT hc FROM ( SELECT * FROM sensor ORDER 
                     echo '"' . $b['time'] . '",';
                   } ?>],
         datasets: [{
-            label: "température",
+            label: "Temperature",
             fill: true,
             lineTension: 0.1,
             backgroundColor: "rgba(0,123,255, .2)",
@@ -63,7 +67,7 @@ $y_hc   = mysqli_query($connexion, 'SELECT hc FROM ( SELECT * FROM sensor ORDER 
                     } ?>],
           },
           {
-            label: "Humidité",
+            label: "Temperature Sensor Probe",
             fill: true,
             lineTension: 0.1,
             backgroundColor: "rgb(255, 153, 0, .2)",
@@ -81,12 +85,12 @@ $y_hc   = mysqli_query($connexion, 'SELECT hc FROM ( SELECT * FROM sensor ORDER 
             pointHoverBorderWidth: 2,
             pointRadius: 5,
             pointHitRadius: 10,
-            data: [<?php while ($b = mysqli_fetch_array($y_hum)) {
-                      echo  $b['hum'] . ',';
+            data: [<?php while ($b = mysqli_fetch_array($y_sondetemp)) {
+                      echo  $b['sondetemp'] . ',';
                     } ?>],
           },
           {
-            label: "Indice de température",
+            label: "Heat index",
             fill: true,
             lineTension: 0.1,
             backgroundColor: "rgba(255, 0, 0, .2)",

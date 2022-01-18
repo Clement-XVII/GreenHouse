@@ -1,13 +1,13 @@
 <?php
-include "../../connex.php";
+include "../../../connex.php";
 ?>
 <?php
 session_start();
-require_once '../../config.php'; // ajout connexion bdd
+require_once '../../../config.php'; // ajout connexion bdd
 // si la session existe pas soit si l'on est pas connecté on redirige
 if (!isset($_SESSION['user'])) {
-  header('Location:../../index.php');
-  die();                             //importe le fichier de connexion à la base de données, vérifie si l'utilisateur et connecté ou non et ses droit admin ou membre
+  header('Location:../../../index.php');
+  die();                                                                                      //importe le fichier de connexion à la base de données, vérifie si l'utilisateur et connecté ou non et ses droit admin ou membre
 }
 
 // On récupere les données de l'utilisateur
@@ -15,19 +15,15 @@ $req = $bdd->prepare('SELECT * FROM utilisateurs WHERE token = ?');
 $req->execute(array($_SESSION['user']));
 $data = $req->fetch();
 
-if ($data['droit'] == 0) {
-  header('Location: ../../index.php');
-  die();
-}
 if ($data['active'] == 1) {
-  header('Location: ../../index.php');
+  header('Location: ../../../index.php');
   die();
 }
 ?>
 <?php
 function filter($choix)
 {
-    include "../../connex.php";
+    include "../../../connex.php";
     if (isset($_GET['sdate']) || isset($_GET['edate'])) {
 
         $sdate = $_GET['sdate'];
@@ -51,7 +47,7 @@ function filter($choix)
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="../../globe.ico" />
+  <link rel="icon" href="../../../globe.ico" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
   <title>Dashboard</title>
@@ -70,7 +66,7 @@ function filter($choix)
       }
     }
   </style>
-  <link href="../../assets/css/dashboard.css" rel="stylesheet">
+  <link href="../../../assets/css/dashboard.css" rel="stylesheet">
 </head>
 
 <body>
@@ -91,7 +87,7 @@ function filter($choix)
           </h6>
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link" href="../../dashboard/index.php">
+              <a class="nav-link" href="../../dashboard/dashboard.php">
                 <span data-feather="home"></span>
                 Home
               </a>
@@ -144,22 +140,10 @@ function filter($choix)
                 </a>
               </h6>
               <ul class="nav flex-column mb-2">
-              <li class="nav-item">
-                  <a class="nav-link" href="../../admin_dash/index.php">
-                    <span data-feather="users"></span>
-                    Admin Panel Management
-                  </a>
-                </li>
                 <li class="nav-item">
                   <a class="nav-link" href="../../utilisateur/change_pwd.php">
                     <span data-feather="lock"></span>
                     Change your password
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="../../utilisateur/inscription_admin.php">
-                    <span data-feather="user-plus"></span>
-                    New user
                   </a>
                 </li>
               </ul>
@@ -187,7 +171,7 @@ function filter($choix)
             </div>
             <div class="btn-group me-2">
               <a type="button" class="btn btn-sm btn-outline-secondary" onclick="Export()">Export to CSV file</a>
-              <a type="button" class="btn btn-sm btn-outline-secondary" href='../../serreconnectee.sql'>Recover SQL</a>
+              <a type="button" class="btn btn-sm btn-outline-secondary" href='../../../serreconnectee.sql'>Recover SQL</a>
             </div>
             <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
               <a href='../tableau.php' class='btn btn-sm btn-outline-secondary'>Home</a>
@@ -281,13 +265,13 @@ function filter($choix)
                           } ?>],
                 datasets: [
                     {
-                  label: 'O2',
-                  data: [<?php filter(gas2); ?>],
+                  label: 'CO2',
+                  data: [<?php filter(ldr); ?>],
                   backgroundColor: [
-                    'rgba(204,80,125, .2)',
+                    'rgba(190,190,190, .2)',
                   ],
                   borderColor: [
-                    'rgba(204, 80, 125, 1)',
+                    'rgba(190, 190, 190, 1)',
                   ],
                   borderWidth: 1.5,
                   hidden: false
@@ -360,10 +344,10 @@ function filter($choix)
       </main>
     </div>
   </div>
-  <script src="../../assets/js/jquery.min.js"></script>
-  <script src="../../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="../../assets/js/feather.min.js"></script>
-  <script src="../../assets/js/Chart.min.js"></script>
+  <script src="../../../assets/js/jquery.min.js"></script>
+  <script src="../../../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../../assets/js/feather.min.js"></script>
+  <script src="../../../assets/js/Chart.min.js"></script>
   <script>
     feather.replace()
   </script>

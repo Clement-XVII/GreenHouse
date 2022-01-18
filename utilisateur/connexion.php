@@ -30,13 +30,15 @@
                     if($email == "admin" or $data['droit'] == 1 ){
                          // On créer la session et on redirige sur landing.php
                         $_SESSION['user'] = $data['token'];
+                        $bdd->prepare("UPDATE utilisateurs SET last_activity = NOW() WHERE token = ?")->execute([$data['token']]);
                         header('Location: ../dashboard/index.php');
                         die();
                     }
                     else {
                         // On créer la session et on redirige sur landing_admin.php
                         $_SESSION['user'] = $data['token'];
-                        header('Location: ../membre/dashboard/dashboard_membre.php');           //*****************************************************************-----------------------------------------*****************************************
+                        $bdd->prepare("UPDATE utilisateurs SET last_activity = NOW() WHERE token = ?")->execute([$data['token']]);
+                        header('Location: ../membre/dashboard/dashboard.php');           //*****************************************************************-----------------------------------------*****************************************
                         die();
                     }
                 }

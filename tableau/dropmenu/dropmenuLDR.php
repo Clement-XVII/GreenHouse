@@ -281,13 +281,13 @@ function filter($choix)
                           } ?>],
                 datasets: [
                     {
-                  label: 'O2',
-                  data: [<?php filter(gas2); ?>],
+                  label: 'CO2',
+                  data: [<?php filter(ldr); ?>],
                   backgroundColor: [
-                    'rgba(204,80,125, .2)',
+                    'rgba(190,190,190, .2)',
                   ],
                   borderColor: [
-                    'rgba(204, 80, 125, 1)',
+                    'rgba(190, 190, 190, 1)',
                   ],
                   borderWidth: 1.5,
                   hidden: false

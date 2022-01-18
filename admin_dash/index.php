@@ -194,6 +194,7 @@ if ($data['active'] == 1) {
                       <th>Privileges</th>
                       <th>User deactivation</th>
                       <th>registration date</th>
+                      <th>Last Activity</th>
                       <th>Options</th>
                     </thead>
                     <tbody>
@@ -233,18 +234,20 @@ if ($data['active'] == 1) {
               e.preventDefault();
               //var tr = $(this).closest('tr');
               var date_inscription = $('#date_inscriptionField').val();
+              var last_activity = $('#last_activityField').val();
               var pseudo = $('#nameField').val();
               var droit = $('#droitField').val();
               var active = $('#activeField').val();
               var email = $('#emailField').val();
               var trid = $('#trid').val();
               var id = $('#id').val();
-              if (date_inscription != '' && pseudo != '' && droit != '' && active != '' && email != '') {
+              if (date_inscription != '' && pseudo != '' && droit != '' && active != '' && email != '' && last_activity != '') {
                 $.ajax({
                   url: "update_user.php",
                   type: "post",
                   data: {
                     date_inscription: date_inscription,
+                    last_activity: last_activity,
                     pseudo: pseudo,
                     droit: droit,
                     active: active,
@@ -263,7 +266,7 @@ if ($data['active'] == 1) {
                       // table.cell(parseInt(trid) - 1,4).data(date_inscription);
                       var button = '<td><a href="javascript:void();" data-id="' + id + '" class="btn btn-info btn-sm editbtn">Edit</a>  <a href="#!"  data-id="' + id + '"  class="btn btn-danger btn-sm deleteBtn">Delete</a></td>';
                       var row = table.row("[id='" + trid + "']");
-                      row.row("[id='" + trid + "']").data([id, pseudo, email, droit, active, date_inscription, button]);
+                      row.row("[id='" + trid + "']").data([id, pseudo, email, droit, active, date_inscription, last_activity, button]);
                       $('#exampleModal').modal('hide');
                     } else {
                       alert('failed');
@@ -294,6 +297,7 @@ if ($data['active'] == 1) {
                   $('#droitField').val(json.droit);
                   $('#activeField').val(json.active);
                   $('#date_inscriptionField').val(json.date_inscription);
+                  $('#last_activityField').val(json.last_activity);
                   $('#id').val(id);
                   $('#trid').val(trid);
                 }
@@ -373,6 +377,12 @@ if ($data['active'] == 1) {
                       <label for="date_inscriptionField" class="col-md-3 form-label">registration date</label>
                       <div class="col-md-9">
                         <input type="text" class="form-control" id="date_inscriptionField" name="date_inscription">
+                      </div>
+                    </div>
+                    <div class="mb-3 row">
+                      <label for="last_activityField" class="col-md-3 form-label">Last Activity</label>
+                      <div class="col-md-9">
+                        <input type="text" class="form-control" id="last_activityField" name="last_activity">
                       </div>
                     </div>
                     <div class="text-center">

@@ -1,12 +1,12 @@
 <?php
-include "../connex.php";
+include "../../connex.php";
 ?>
 <?php
 session_start();
-require_once '../config.php'; // ajout connexion bdd
+require_once '../../config.php'; // ajout connexion bdd
 // si la session existe pas soit si l'on est pas connecté on redirige
 if (!isset($_SESSION['user'])) {
-  header('Location:../index.php');
+  header('Location:../../index.php');
   die();
 }
 
@@ -15,12 +15,8 @@ $req = $bdd->prepare('SELECT * FROM utilisateurs WHERE token = ?');
 $req->execute(array($_SESSION['user']));
 $data = $req->fetch();
 
-if ($data['droit'] == 0) {
-  header('Location: ../index.php');
-  die();
-}
 if ($data['active'] == 1) {
-  header('Location: ../index.php');
+  header('Location: ../../index.php');
   die();
 }
 ?>
@@ -33,6 +29,7 @@ $humsol = '';
 $sondetemp = '';
 $gas = '';
 $gas2 = '';
+$ldr = '';
 $today = date("Y-m-d H:i:s");
 $tommorow = date('Y-m-d H:i:s', strtotime($today . ' +1 day'));
 //query to get data from the table
@@ -73,8 +70,8 @@ $ldr = trim($ldr, ",");
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="../globe.ico" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="icon" href="../../globe.ico" />
+  <link href="../../assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <title>Gauge</title>
   <style>
     .bd-placeholder-img {
@@ -103,12 +100,12 @@ $ldr = trim($ldr, ",");
       display: inline-block;
     }
   </style>
-  <link href="../assets/css/dashboard.css" rel="stylesheet">
+  <link href="../../assets/css/dashboard.css" rel="stylesheet">
 </head>
 
 <body>
   <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="https://github.com/Clement-XVII/GreenHouse">Connected GreenHouse</a>
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="https://github.com/Clement-XVII/Serre_connectee">Connected GreenHouse</a>
     <!--px-2-->
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -126,7 +123,7 @@ $ldr = trim($ldr, ",");
           </h6>
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link" href="../dashboard/index.php">
+              <a class="nav-link" href="../dashboard/dashboard.php">
                 <span data-feather="home"></span>
                 Home
               </a>
@@ -180,22 +177,10 @@ $ldr = trim($ldr, ",");
                 </a>
               </h6>
               <ul class="nav flex-column mb-2">
-              <li class="nav-item">
-                  <a class="nav-link" href="../admin_dash/index.php">
-                    <span data-feather="users"></span>
-                    Admin Panel Management
-                  </a>
-                </li>
                 <li class="nav-item">
                   <a class="nav-link" href="../utilisateur/change_pwd.php">
                     <span data-feather="lock"></span>
                     Change your password
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="../utilisateur/inscription_admin.php">
-                    <span data-feather="user-plus"></span>
-                    New user
                   </a>
                 </li>
               </ul>
@@ -231,10 +216,10 @@ $ldr = trim($ldr, ",");
           <div id="g4" class="gauge"></div>
           <div id="g5" class="gauge"></div>
           <div id="g6" class="gauge"></div>
-	        <div id="g7" class="gauge"></div>
+          <div id="g7" class="gauge"></div>
         </div>
-        <script src="../assets/js/raphael-2.1.4.min.js"></script>
-        <script src="../assets/js/justgage.js"></script>
+        <script src="../../assets/js/raphael-2.1.4.min.js"></script>
+        <script src="../../assets/js/justgage.js"></script>
         <script>
           var g = new JustGage({
             id: "g",
@@ -539,7 +524,7 @@ $ldr = trim($ldr, ",");
             }],
           });
 
-	  var g7 = new JustGage({
+          var g7 = new JustGage({
             id: "g7",
             label: "LDR",
             value: [<?php echo $ldr; ?>],
@@ -582,8 +567,8 @@ $ldr = trim($ldr, ",");
             }],
           });
         </script>
-        <script src="../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
-        <script src="../assets/js/feather.min.js"></script>
+        <script src="../../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="../../assets/js/feather.min.js"></script>
         <script>
           feather.replace()
         </script>

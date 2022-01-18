@@ -14,6 +14,7 @@ if(isset($_POST['search']['value']))
 	$sql .= " OR droit like '%".$search_value."%'";
 	$sql .= " OR active like '%".$search_value."%'";
 	$sql .= " OR date_inscription like '%".$search_value."%'";
+	$sql .= " OR last_activity like '%".$search_value."%'";
 }
 
 if(isset($_POST['order']))
@@ -46,14 +47,15 @@ while($row = mysqli_fetch_assoc($query))
 	$sub_array[] = $row['droit'];
 	$sub_array[] = $row['active'];
 	$sub_array[] = $row['date_inscription'];
+	$sub_array[] = $row['last_activity'];
 	$sub_array[] = '<a href="javascript:void();" data-id="'.$row['id'].'"  class="btn btn-info btn-sm editbtn" >Edit</a>  <a href="javascript:void();" data-id="'.$row['id'].'"  class="btn btn-danger btn-sm deleteBtn" >Delete</a>';
 	$data[] = $sub_array;
 }
 
 $output = array(
-	'draw'=> intval($_POST['draw']),
-	'recordsTotal' =>$count_rows ,
-	'recordsFiltered'=>   $total_all_rows,
+	'draw'=>intval($_POST['draw']),
+	'recordsTotal'=>$count_rows,
+	'recordsFiltered'=>$total_all_rows,
 	'data'=>$data,
 );
-echo  json_encode($output);
+echo json_encode($output);

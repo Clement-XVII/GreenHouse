@@ -8,7 +8,7 @@ if(isset($_GET["temp"])) {
    $sondetemp = $_GET["sondetemp"];
    $CO2 = $_GET["gas"];
    $O2 = $_GET["gas2"];
-
+   $ldr = $_GET["ldr"];
 
 
 $connexion = new mysqli($host, $user, $pass, $database);
@@ -19,7 +19,7 @@ $connexion = new mysqli($host, $user, $pass, $database);
 
    $connexion->query($sql);
 
-   $sql = "INSERT INTO sensor (temp, hum, hc, humsol, sondetemp, gas, gas2) VALUES ($temperature, $humidity, $hc, $humiditesol, $sondetemp, $CO2, $O2)";
+   $sql = "INSERT INTO sensor (temp, hum, hc, humsol, sondetemp, gas, gas2, ldr) VALUES ($temperature, $humidity, $hc, $humiditesol, $sondetemp, $CO2, $O2, $ldr)";
 //     $sql = "INSERT INTO sensor (temp, hum, hc, humsol) VALUES ($temperature, $humidity, $hc, $humiditesol)";
 
    if ($connexion->query($sql) === TRUE) {
@@ -30,6 +30,6 @@ $connexion = new mysqli($host, $user, $pass, $database);
 
    $connexion->close();
 } else {
-   echo "temperature is not set";
+   echo "data is not set";
 }
 ?>

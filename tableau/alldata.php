@@ -182,6 +182,7 @@ if ($data['active'] == 1) {
                   <li><a class="dropdown-item" href="../tableau/dropmenu/dropmenuHum.php">Humidity</a></li>
                   <li><a class="dropdown-item" href="../tableau/dropmenu/dropmenuCO2.php">CO2</a></li>
                   <li><a class="dropdown-item" href="../tableau/dropmenu/dropmenuO2.php">O2</a></li>
+                  <li><a class="dropdown-item" href="../tableau/dropmenu/dropmenuLDR.php">LDR</a></li>
                 </ul>
               </div>
             </div>

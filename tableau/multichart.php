@@ -210,6 +210,7 @@ function filter($choix)
                   <li><a class="dropdown-item" href="../tableau/dropmenu/dropmenuHum.php">Humidity</a></li>
                   <li><a class="dropdown-item" href="../tableau/dropmenu/dropmenuCO2.php">CO2</a></li>
                   <li><a class="dropdown-item" href="../tableau/dropmenu/dropmenuO2.php">O2</a></li>
+                  <li><a class="dropdown-item" href="../tableau/dropmenu/dropmenuLDR.php">LDR</a></li>
                 </ul>
               </div>
             </div>            
@@ -504,9 +505,9 @@ function filter($choix)
 
             $sdate = $_GET['sdate'];
             $edate = $_GET['edate'];
-            $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol,sondetemp,gas,gas2 FROM sensor WHERE time BETWEEN ' $sdate ' AND ' $edate ' ORDER BY ID DESC LIMIT 0,100");
+            $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol,sondetemp,gas,gas2,ldr FROM sensor WHERE time BETWEEN ' $sdate ' AND ' $edate ' ORDER BY ID DESC LIMIT 0,100");
           } else {
-            $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol,sondetemp,gas,gas2 FROM sensor ORDER BY ID DESC LIMIT 0,100");
+            $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol,sondetemp,gas,gas2,ldr FROM sensor ORDER BY ID DESC LIMIT 0,100");
           }
 
           ?>
@@ -523,6 +524,7 @@ function filter($choix)
                 <th class='text-center'>Temperature Sensor Probe (°C)</th>
                 <th class='text-center'>CO2 (ppm)</th>
                 <th class='text-center'>O2 (%)</th>
+                <th class='text-center'>LDR (Lux)</th>
                 </tr>
               </thead>
               <tbody>
@@ -538,6 +540,7 @@ function filter($choix)
 <td><center>$data[sondetemp]</td>
 <td><center>$data[gas]</td>
 <td><center>$data[gas2]</td>
+<td><center>$data[ldr]</td>
 </tr>";
                 }
                 ?>

@@ -1,12 +1,12 @@
 <?php
-include "../connex.php";
+include "../../connex.php";
 ?>
 <?php
 session_start();
-require_once '../config.php'; // ajout connexion bdd
+require_once '../../config.php'; // ajout connexion bdd
 // si la session existe pas soit si l'on est pas connecté on redirige
 if (!isset($_SESSION['user'])) {
-  header('Location:../index.php');
+  header('Location:../../index.php');
   die();                                                                                      //importe le fichier de connexion à la base de données, vérifie si l'utilisateur et connecté ou non et ses droit admin ou membre
 }
 
@@ -15,26 +15,25 @@ $req = $bdd->prepare('SELECT * FROM utilisateurs WHERE token = ?');
 $req->execute(array($_SESSION['user']));
 $data = $req->fetch();
 
-if ($data['droit'] == 0) {
-  header('Location: ../index.php');
-  die();
-}
 if ($data['active'] == 1) {
-  header('Location: ../index.php');
+  header('Location: ../../index.php');
   die();
 }
 ?>
-<!-- *****************************************************Création de la barre de navigation*********************************************************** -->
+
 <!doctype html>
 <html lang="en">
 
 <head>
   <meta charset="utf-8">
+  <link rel="icon" href="../../globe.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="../globe.ico" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
-  <title>Home</title>
+  <link href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+  <link href="../../assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
+  <title>Live data</title>
   <style>
     .bd-placeholder-img {
       font-size: 1.125rem;
@@ -50,7 +49,7 @@ if ($data['active'] == 1) {
       }
     }
   </style>
-  <link href="../assets/css/dashboard.css" rel="stylesheet">
+  <link href="../../assets/css/dashboard.css" rel="stylesheet">
 </head>
 
 <body>
@@ -71,7 +70,7 @@ if ($data['active'] == 1) {
           </h6>
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link active" href="../dashboard/index.php">
+              <a class="nav-link active" href="../dashboard/dashboard.php">
                 <span data-feather="home"></span>
                 Home
               </a>
@@ -124,22 +123,10 @@ if ($data['active'] == 1) {
                 </a>
               </h6>
               <ul class="nav flex-column mb-2">
-              <li class="nav-item">
-                  <a class="nav-link" href="../admin_dash/index.php">
-                    <span data-feather="users"></span>
-                    Admin Panel Management
-                  </a>
-                </li>
                 <li class="nav-item">
                   <a class="nav-link" href="../utilisateur/change_pwd.php">
                     <span data-feather="lock"></span>
                     Change your password
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="../utilisateur/inscription_admin.php">
-                    <span data-feather="user-plus"></span>
-                    New user
                   </a>
                 </li>
               </ul>
@@ -150,7 +137,7 @@ if ($data['active'] == 1) {
                   <strong><?php echo $data['pseudo']; ?></strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                  <li><a class="dropdown-item" href="../utilisateur/deconnexion.php">Sign out</a></li>
+                  <li><a class="dropdown-item" href="../../utilisateur/deconnexion.php">Sign out</a></li>
                 </ul>
               </div>
             </ul>
@@ -166,65 +153,36 @@ if ($data['active'] == 1) {
               <a type="button" class="btn btn-sm btn-outline-secondary" href="https://www.lycee-saint-cricq.org/formations/enseignement-secondaire/bac-pro-sn/">Bac Pro SN</a>
             </div>
             <div class="btn-group me-2">
-              <a type="button" class="btn btn-sm btn-outline-secondary" href="../dashboard2/dashboard2.php">Live data</a>
+              <a type="button" class="btn btn-sm btn-outline-secondary" href="../dashboard/dashboard.php">Go back</a>
             </div>
           </div>
         </div>
-        <!-- ********************************************************************************************************************************************************************************************* -->
-        <canvas class="my-4 w-100" id="graphCanvas" width="900" height="380"></canvas> <!-- GRAPHIQUE ET TABLEAU-->
+        <!-- *********************************************************************************************************-->
         <script>
-          $(document).ready(function() {
-            showGraph();
-          });
-
-          function showGraph() {
-            {
-              $.post("data.php",
-                function(data) {
-                  console.log(data);
-                  var name = [];
-                  var temp = [];
-
-                  for (var i in data) {
-                    name.push(data[i].time);
-                    temp.push(data[i].temp);
-                  }
-
-                  var chartdata = {
-                    labels: name,
-                    datasets: [{
-                      label: 'Temperature',
-                      backgroundColor: 'transparent',
-                      borderColor: '#007bff',
-                      lineTension: 0,
-                      borderWidth: 4,
-                      pointBackgroundColor: '#007bff',
-                      data: temp,
-                      options: {
-                        scales: {
-                          yAxes: [{
-                            ticks: {
-                              beginAtZero: true,
-                            }
-                          }]
-                        }
-                      }
-                    }]
-                  }
-                  var graphTarget = $("#graphCanvas");
-
-                  var barGraph = new Chart(graphTarget, {
-                    type: 'line',
-                    data: chartdata,
-                  });
-                });
-            }
-          }
+          var refreshId = setInterval(function() {
+            $('#responsecontainer').load('data.php');
+          }, 1000);
         </script>
-        <div class="table-responsive">
-          <table class="table table-bordered table-striped">
-            <thead>
-              <tr>
+        <div class="container">
+          <script type="text/javascript" src="../../assets/js/mdb.min.js"></script>
+          <div id="responsecontainer">
+          </div>
+        </div>
+        
+        <body>
+          <script>
+            $(document).ready(function() {
+              var table = $('#example').DataTable({
+                responsive: true
+              });
+
+              new $.fn.dataTable.FixedHeader(table);
+            });
+          </script>
+          <div class="table-responsive-sm">
+            <table id="example" class="table table-striped" style="width:100%">
+              <thead>
+                <tr>
                 <th class='text-center'>ID</th>
                 <th class='text-center'>Date</th>
                 <th class='text-center'>Temperature (°C)</th>
@@ -235,14 +193,14 @@ if ($data['active'] == 1) {
                 <th class='text-center'>CO2 (ppm)</th>
                 <th class='text-center'>O2 (%)</th>
                 <th class='text-center'>LDR (Lux)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Ajoute les données dans le tableau -->
-              <?php
-              $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol,sondetemp,gas,gas2,ldr FROM sensor ORDER BY ID DESC LIMIT 48");
-              while ($data = mysqli_fetch_array($sqlAdmin)) {
-                echo "<tr >
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Ajoute les données dans le tableau -->
+                <?php
+                $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol,sondetemp,gas,gas2,ldr FROM sensor ORDER BY ID DESC LIMIT 100");
+                while ($data = mysqli_fetch_array($sqlAdmin)) {
+                  echo "<tr >
 <td><center>$data[id]</td>
 <td><center>$data[time]</center></td>
 <td><center>$data[temp]</td>
@@ -254,20 +212,17 @@ if ($data['active'] == 1) {
 <td><center>$data[gas2]</td>
 <td><center>$data[ldr]</td>
 </tr>";
-              }
-              ?>
-            </tbody>
-          </table>
-        </div>
-    </div>
-  </div>
-  <script src="../assets/js/jquery.min.js"></script>
-  <script src="../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="../assets/js/feather.min.js"></script>
-  <script src="../assets/js/Chart.min.js"></script>
-  <script>
-    feather.replace()
-  </script>
+                }
+                ?>
+            </table>
+          </div>
+          <!--************************************************************************************************************-->
+
+<script src="../../assets/js/feather.min.js"></script>
+<script src="../../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script>
+feather.replace()
+</script>
 </body>
 
 </html>
