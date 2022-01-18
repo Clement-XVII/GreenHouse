@@ -4,6 +4,7 @@
   <br>
 </h1>
 
+## Description:
 This is my connected greenhouse project for high school.
 
 All this allows to collect data from an arduino and send them to a database.
