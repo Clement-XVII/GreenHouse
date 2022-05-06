@@ -1,19 +1,22 @@
 #include <SPI.h>
 #include <Ethernet.h>
-#include "DHT.h"   
+#include "DHT.h"
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <SD.h>  
-
+#include <Wire.h>
+#include "rgb_lcd.h"
 
 //****************************************************************//
-#define DHTPIN 8
+#define DHTPIN A12
 #define DHTTYPE DHT22
 DHT dht(DHTPIN, DHTTYPE);
 //****************************************************************//
 #define ONE_WIRE_BUS A0
 OneWire oneWire(ONE_WIRE_BUS);            //<--- sonde
 DallasTemperature sensors(&oneWire);
+//****************************************************************//
+rgb_lcd lcd;
 //****************************************************************//
 int moistPin = A5;
 int moistValue;                     //<--- humsol
@@ -22,9 +25,9 @@ int humsol = 0;
 //****************************************************************//
 const int chipSelect = 4;
 const float VRefer = 3.3;       //<--- O2
-const int pinAdc   = A1;
+const int pinAdc   = A2;
 //****************************************************************//
-#define         MG_PIN                       (A2)     //define which analog input channel you are going to use
+#define         MG_PIN                       (A4)     //define which analog input channel you are going to use
 #define         BOOL_PIN                     (2)
 #define         DC_GAIN                      (8.5)   //define the DC gain of amplifier
 #define         READ_SAMPLE_INTERVAL         (50)    //define how many samples you are going to take in normal operation
@@ -36,11 +39,11 @@ float           CO2Curve[3]  =  {2.602,ZERO_POINT_VOLTAGE,(REACTION_VOLTGAE/(2.6
 byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
   
-IPAddress ip(192,168,1,209);
-//IPAddress ip(xxx,xxx,xxx,xxx);                                      //-> Ip de l'arduino
+IPAddress ip(192,168,137,6);
+//IPAddress ip(xxx,xxx,xxx,xxx); //-> Ip de l'arduino
+IPAddress gateway(192,168,137,1);
 
-
-char server[] = "192.168.1.41";                                     //->Ip du serveur
+char server[] = "90.54.18.168";                                     //->Ip du serveur
 //char server[] = "xxx.xxx.xxx.xxx";
 
 EthernetClient client;
@@ -49,10 +52,12 @@ void setup() {
  
   // Serial.begin lance la connexion série entre l'ordinateur et l'Arduino.
   Serial.begin(9600);
+  lcd.begin(16, 2);
   dht.begin();
   sensors.begin();
   pinMode(4, OUTPUT); // broche d'alimentation de la sonde
   digitalWrite(4, LOW);
+  pinMode(A14,INPUT);
 
 Serial.print("Initializing SD card...");
 if (!SD.begin(chipSelect)) {
@@ -86,13 +91,11 @@ void loop() {
   }
 
   digitalWrite(4, HIGH); // met la sonde sous tension
-  delay(1000);
   moistVal = analogRead(moistPin);
   humsol = Conversion(moistVal);
 //****************************************************************//
 float Vout =0;
     Vout = readO2Vout();
-    delay(500);
 //****************************************************************//
 int gas;
     float volts;
@@ -100,8 +103,9 @@ int gas;
     volts = MGRead(MG_PIN);
 
     gas = MGGetPercentage(volts,CO2Curve);
-    delay(500);
 
+//****************************************************************//
+int ldr=analogRead(A3);  //<-----LDR
 //****************************************************************//
   Serial.print("DHT22 : ");
   Serial.println(t); //<---dht22
@@ -115,10 +119,10 @@ int gas;
   Serial.println(gas);  //<----- CO2
   Serial.print("O2 : "); 
   Serial.println(gaso()); //<----- O2
+  Serial.print("LDR : ");
+  Serial.println(ldr);
   Serial.println("OK");
 
-  delay(100);
-  
   File sdcard_file = SD.open("data.txt", FILE_WRITE);
     if (sdcard_file) {
     sdcard_file.print("Temperature en Celsius: ");
@@ -135,6 +139,8 @@ int gas;
     sdcard_file.print(gas);sdcard_file.println(" ppm;");
     sdcard_file.print("O2: ");
     sdcard_file.print(gaso());sdcard_file.println(" %;");
+    sdcard_file.print("LDR: ");
+    sdcard_file.print(ldr);sdcard_file.println(" LUX;");
     sdcard_file.println();
     sdcard_file.println();
     sdcard_file.close();
@@ -147,7 +153,7 @@ int gas;
   
  
   // Connect to the server (your computer or web page)  
-  if (client.connect(server, 80)) {
+  if (client.connect(server, 31320)) {
     client.print("GET /writedata2.php?"); // This
     client.print("temp="); // This
     client.print(t); //print de la variable dans la requête GET
@@ -162,9 +168,11 @@ int gas;
     client.print("&gas=");
     client.print(gas);
     client.print("&gas2=");
-    client.print(gaso());   //<----- les parentheses ???
+    client.print(gaso());
+    client.print("&ldr=");
+    client.print(ldr);
     client.println(" HTTP/1.1"); // Partie de la demande GET
-    client.println("Host: 192.168.1.41");   //->Ip du serveur
+    client.println("Host: 90.54.18.168");   //->Ip du serveur
     //client.println("Host: xxx.xxx.xxx.xxx");   //->Ip du serveur
     client.println("Connection: close"); // Partie de la demande GET indiquant au serveur que nous avons terminé de transmettre le message
     client.println(); 
@@ -177,7 +185,80 @@ int gas;
     // Si l'Arduino ne peut pas se connecter au serveur
     Serial.println("--> connection failed\n");
   }
- 
+  
+  lcd.setCursor(5, 0);
+  lcd.print("DHT 22");
+  delay(3000); 
+  lcd.clear();
+
+  lcd.setCursor(0, 0);
+  lcd.print("Humidity: ");
+  lcd.print(h);
+  lcd.print("%");
+  lcd.setCursor(0,1);
+  lcd.print("TempAir: "); 
+  lcd.print(t);
+  lcd.write( (char)223);
+  lcd.print("C");
+  delay(5000);
+  lcd.clear();
+  
+  lcd.setCursor(3,0);
+  lcd.print("HeatIndex:");
+  lcd.setCursor(4,1);
+  lcd.print(hc);
+  lcd.write( (char)223);
+  lcd.print("C");
+  delay(5000);
+  lcd.clear();
+
+  lcd.setCursor(2,0);
+  lcd.print("Temperature");
+  lcd.setCursor(2,1);
+  lcd.print("Sensor Probe");
+  delay(3000);
+  lcd.clear();
+  lcd.print("Temp: ");
+  lcd.print(sondetemp);
+  lcd.write((char)223);
+  lcd.print("C");
+  delay(5000);
+  lcd.clear();
+
+  lcd.setCursor(7,0);
+  lcd.print("O2");
+  lcd.setCursor(3,1);
+  lcd.print("Gas Sensor");
+  delay(3000);
+  lcd.clear();
+  lcd.print("O2: ");
+  lcd.print(gaso());
+  lcd.print("%");
+  delay(5000);
+  lcd.clear();
+
+  lcd.setCursor(1,0);
+  lcd.print("CO2 Gas Sensor");
+  lcd.setCursor(5,1);
+  lcd.print("SEN0159");
+  delay(3000);
+  lcd.clear();
+  lcd.print("CO2: ");
+  lcd.print(gas);
+  lcd.print("ppm");
+  delay(5000);
+  lcd.clear();
+
+  lcd.setCursor(6,0);
+  lcd.print("LDR");
+  lcd.setCursor(1,1);
+  lcd.print("Photoresistor");
+  delay(3000);
+  lcd.clear();
+  lcd.print("LDR: ");
+  lcd.print(ldr);
+  lcd.print(" lux");
+  lcd.clear();
   delay(10000);
   //delay(1800000);
 }
@@ -237,3 +318,4 @@ int  MGGetPercentage(float volts, float *pcurve)
       return pow(10, ((volts/DC_GAIN)-pcurve[1])/pcurve[2]+pcurve[0]);
    }
 }
+//******************************************************************//
