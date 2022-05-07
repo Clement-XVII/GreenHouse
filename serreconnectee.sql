@@ -5324,9 +5324,8 @@ CREATE TABLE `utilisateurs` (
 --
 
 INSERT INTO `utilisateurs` (`id`, `pseudo`, `email`, `password`, `droit`, `ip`, `token`, `active`, `date_inscription`) VALUES
-(1, 'admin', 'admin', '$2y$12$BoeIo8wyX3tPlgDj.nw.4ee7A1YQK7Rdk9XY4cdSdFRbF8Z7Q.Ui.', 1, '192.168.1.46', '1be1a4ea94cdfda0559187a4bb17607c2a316f442d6ff88317f327ac27cdf841c33da675e46e41597709edbaa023422aec8fb9dce068565b9d0bbe9aa0ba19d5', 0, '2021-10-01 17:04:44'),
-(6, 'louis', 'louis.autexier@gmail.com', '$2y$12$U3rbZoD5SO6oZjvFEWFlV.Bg8r4tINXPftDnCt3Fw.OGtPTzTLTUy', 0, '192.168.1.46', 'dd833fbf540e2d5af3ccf709c7e1f5d0549a8756c530d2f3bff899a42f801dce43141cfc367cf3dbdd7f7f26c912a1044dd16e824ac3a5269781f33155c1dae2', 0, '2021-11-03 10:33:36'),
-(2, 'Orion_XVIII', 'clement.autexier@gmail.com', '$2y$12$d5JjwhzZIEz9IDcRGFffQutd9cZOaODKu8nBjnJaeXkm0CTmZgwia', 1, '192.168.1.34', 'd4536433f24ca6f5c67b20b0675c3924075ca70e3120de4c4514c090e99436cf067975a3726fc603f62f44806c3ff031e61e61f594ef83e5316b515d5336e96a', 1, '2021-11-01 16:00:18');
+(1, 'admin', 'admin', '$2a$12$sKdBuonrymNEhfksXVmaI.cz/CSs4YFyPQ.3Mv5BSYkHw8SwB4NiG', 1, '192.168.1.46', '1be1a4ea94cdfda0559187a4bb17607c2a316f442d6ff88317f327ac27cdf841c33da675e46e41597709edbaa023422aec8fb9dce068565b9d0bbe9aa0ba19d5', 0, '2021-10-01 17:04:44'),
+
 
 --
 -- Index pour les tables déchargées
