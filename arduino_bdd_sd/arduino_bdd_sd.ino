@@ -1,11 +1,11 @@
 #include <SPI.h>
 #include <Ethernet.h>
-#include "DHT.h"
+#include <DHT.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <SD.h>  
 #include <Wire.h>
-#include "rgb_lcd.h"
+#include <rgb_lcd.h>
 
 //****************************************************************//
 #define DHTPIN A12
@@ -18,7 +18,7 @@ DallasTemperature sensors(&oneWire);
 //****************************************************************//
 rgb_lcd lcd;
 //****************************************************************//
-int moistPin = A5;
+int moistPin = A6;
 int moistValue;                     //<--- humsol
 int moistVal = 0;
 int humsol = 0;
@@ -39,11 +39,10 @@ float           CO2Curve[3]  =  {2.602,ZERO_POINT_VOLTAGE,(REACTION_VOLTGAE/(2.6
 byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
   
-IPAddress ip(192,168,137,6);
+IPAddress ip(192,168,1,201);
 //IPAddress ip(xxx,xxx,xxx,xxx); //-> Ip de l'arduino
-IPAddress gateway(192,168,137,1);
 
-char server[] = "90.54.18.168";                                     //->Ip du serveur
+char server[] = "83.193.161.228";                                     //->Ip du serveur
 //char server[] = "xxx.xxx.xxx.xxx";
 
 EthernetClient client;
@@ -105,7 +104,7 @@ int gas;
     gas = MGGetPercentage(volts,CO2Curve);
 
 //****************************************************************//
-int ldr=analogRead(A3);  //<-----LDR
+int ldr=analogRead(A14);  //<-----LDR
 //****************************************************************//
   Serial.print("DHT22 : ");
   Serial.println(t); //<---dht22
@@ -172,7 +171,7 @@ int ldr=analogRead(A3);  //<-----LDR
     client.print("&ldr=");
     client.print(ldr);
     client.println(" HTTP/1.1"); // Partie de la demande GET
-    client.println("Host: 90.54.18.168");   //->Ip du serveur
+    client.println("Host: 83.193.161.228");   //->Ip du serveur
     //client.println("Host: xxx.xxx.xxx.xxx");   //->Ip du serveur
     client.println("Connection: close"); // Partie de la demande GET indiquant au serveur que nous avons terminé de transmettre le message
     client.println(); 
@@ -258,8 +257,8 @@ int ldr=analogRead(A3);  //<-----LDR
   lcd.print("LDR: ");
   lcd.print(ldr);
   lcd.print(" lux");
-  lcd.clear();
   delay(10000);
+  lcd.clear();
   //delay(1800000);
 }
 int Conversion(int value){
