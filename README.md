@@ -15,6 +15,7 @@ There after thanks to the files php connex.php and config.php and web page this 
 - Password: admin
 
 ![Screenshot](https://github.com/Clement-XVII/GreenHouse/blob/main/screenshot/Capture%20d’écran%202022-05-07%20164713.png)
+![Screenshot](https://github.com/Clement-XVII/GreenHouse/blob/main/screenshot/Capture%20d’écran%202022-05-07%20170146.png)
 
 ## Arduino:
 
