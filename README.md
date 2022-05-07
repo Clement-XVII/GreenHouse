@@ -12,7 +12,6 @@ All this allows to collect data from an arduino and send them to a database.
 There after thanks to the files php connex.php and config.php and web page this connects has the base and recovers the data.
 
 Username: admin
-
 Password: admin
 
 ## Arduino:
