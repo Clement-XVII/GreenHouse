@@ -83,13 +83,13 @@ void loop() {
   float sondetemp = sensors.getTempCByIndex(0);
   sensors.requestTemperatures();
 //****************************************************************//
-  digitalWrite(4, LOW);
+  /*digitalWrite(4, LOW);
   for(int temporisation = 0; temporisation <= 0 ; temporisation = temporisation+1) // mettre 86400 !
   {
     delay(500); // cette boucle for protège la sonde car ne fait qu'une mesure par 24h
   }
 
-  digitalWrite(4, HIGH); // met la sonde sous tension
+  digitalWrite(4, HIGH); // met la sonde sous tension */
   moistVal = analogRead(moistPin);
   humsol = Conversion(moistVal);
 //****************************************************************//
@@ -212,6 +212,18 @@ int ldr=analogRead(A14);  //<-----LDR
   lcd.clear();
 
   lcd.setCursor(2,0);
+  lcd.print("Soil Moisture");
+  lcd.setCursor(5,1);
+  lcd.print("Sensor");
+  delay(3000);
+  lcd.clear();
+  lcd.print("Humidity: ");
+  lcd.print(humsol);
+  lcd.print("%");
+  delay(5000);
+  lcd.clear();
+
+  lcd.setCursor(2,0);
   lcd.print("Temperature");
   lcd.setCursor(2,1);
   lcd.print("Sensor Probe");
@@ -263,7 +275,7 @@ int ldr=analogRead(A14);  //<-----LDR
 }
 int Conversion(int value){
  int ValeurPorcentage = 0;
- ValeurPorcentage = map(moistVal, 1023, 0, 0, 100); //map (valeur, valeurbasse, valeurhaute, valeurbasse%, valeurhaute%)
+ ValeurPorcentage = map(moistVal, 0, 646, 0, 100); //map (valeur, valeurbasse, valeurhaute, valeurbasse%, valeurhaute%)
  return ValeurPorcentage;
 }
 
