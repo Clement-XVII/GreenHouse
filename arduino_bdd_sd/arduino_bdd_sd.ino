@@ -54,8 +54,8 @@ void setup() {
   lcd.begin(16, 2);
   dht.begin();
   sensors.begin();
-  pinMode(4, OUTPUT); // broche d'alimentation de la sonde
-  digitalWrite(4, LOW);
+  //pinMode(4, OUTPUT); // broche d'alimentation de la sonde
+  //digitalWrite(4, LOW);
   pinMode(A14,INPUT);
 
 Serial.print("Initializing SD card...");
@@ -269,7 +269,7 @@ int ldr=analogRead(A14);  //<-----LDR
   lcd.print("LDR: ");
   lcd.print(ldr);
   lcd.print(" lux");
-  delay(10000);
+  delay(5000);
   lcd.clear();
   //delay(1800000);
 }
