@@ -32,7 +32,7 @@ function filter($choix)
 
     $sdate = $_GET['sdate'];
     $edate = $_GET['edate'];
-    $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol,sondetemp,gas,gas2 FROM sensor WHERE time BETWEEN ' $sdate ' AND ' $edate ' ORDER BY ID ASC");
+    $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol,sondetemp,gas,gas2,ldr FROM sensor WHERE time BETWEEN ' $sdate ' AND ' $edate ' ORDER BY ID ASC");
     while ($data = mysqli_fetch_array($sqlAdmin)) {
       echo $data[$choix] . ',';
     }
@@ -79,6 +79,38 @@ function filter($choix)
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark w-100 p-0">
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+        <li class="nav-item active">
+        <a class="nav-link" href="#">Heure de Paris: <?php
+                // Set the new timezone
+                date_default_timezone_set('Europe/Paris');
+                $heure = (date('h:i  '));
+                //$heure = '10:00';
+                echo $heure;
+                if ($heure >= '08:00' and $heure <= '21:00') {
+                    $sqlAdmin = mysqli_query($connexion, "SELECT id,ldr FROM (SELECT id,ldr FROM sensor ORDER BY id DESC LIMIT 1) time ORDER BY id ASC");
+                    while ($data = mysqli_fetch_array($sqlAdmin)) {
+                    $a = $data['ldr'];
+                    }
+                    if ($a < "500") {
+                    ?><img class=img-responsive src="../lune.png" style=width:5%><?php
+
+                    } else {
+                    ?><img class=img-responsive src="../soleil.png" style=width:5%><?php
+                    }
+                    
+
+                   }else {
+                    ?><img class=img-responsive src="../lune.png" style=width:5%><?php
+                   }
+                ?>
+            </a>
+        </li>
+        </ul>
+    </div>
+   </nav>
   </header>
   <div class="container-fluid">
     <div class="row">
@@ -245,7 +277,7 @@ function filter($choix)
 
             $sdate = $_GET['sdate'];
             $edate = $_GET['edate'];
-            $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol,gas, gas2,ldr FROM sensor WHERE time BETWEEN ' $sdate ' AND ' $edate ' ORDER BY ID ASC");
+            $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol,gas,gas2,ldr FROM sensor WHERE time BETWEEN ' $sdate ' AND ' $edate ' ORDER BY ID ASC");
           } else {
             //$sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol FROM sensor ORDER BY ID DESC LIMIT 30");
             $sqlAdmin = mysqli_query($connexion, "SELECT * FROM (SELECT * FROM sensor ORDER BY id DESC LIMIT 30) time ORDER BY id ASC");
@@ -364,10 +396,10 @@ function filter($choix)
                     label: 'LDR',
                     data: [<?php filter(ldr); ?>],
                     backgroundColor: [
-                      'rgba(204,80,125, .2)',
+                      'rgba(245,205,39, .2)',
                     ],
                     borderColor: [
-                      'rgba(204, 80, 125, 1)',
+                      'rgba(245, 205, 39, 1)',
                     ],
                     borderWidth: 1.5,
                     hidden: true

@@ -113,6 +113,38 @@ $ldr = trim($ldr, ",");
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark w-100 p-0">
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+        <li class="nav-item active">
+        <a class="nav-link" href="#">Heure de Paris: <?php
+                // Set the new timezone
+                date_default_timezone_set('Europe/Paris');
+                $heure = (date('h:i  '));
+                //$heure = '10:00';
+                echo $heure;
+                if ($heure >= '08:00' and $heure <= '21:00') {
+                    $sqlAdmin = mysqli_query($connexion, "SELECT id,ldr FROM (SELECT id,ldr FROM sensor ORDER BY id DESC LIMIT 1) time ORDER BY id ASC");
+                    while ($data = mysqli_fetch_array($sqlAdmin)) {
+                    $a = $data['ldr'];
+                    }
+                    if ($a < "500") {
+                    ?><img class=img-responsive src="../lune.png" style=width:5%><?php
+
+                    } else {
+                    ?><img class=img-responsive src="../soleil.png" style=width:5%><?php
+                    }
+                    
+
+                   }else {
+                    ?><img class=img-responsive src="../lune.png" style=width:5%><?php
+                   }
+                ?>
+            </a>
+        </li>
+        </ul>
+    </div>
+   </nav>
   </header>
   <div class="container-fluid">
     <div class="row">

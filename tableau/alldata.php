@@ -24,6 +24,17 @@ if ($data['active'] == 1) {
   die();
 }
 ?>
+<?php
+function filter($choix)
+{
+  include "../connex.php";
+
+    $sqlAdmin = mysqli_query($connexion, "SELECT * FROM sensor ORDER BY ID ASC");
+    while ($data = mysqli_fetch_array($sqlAdmin)) {
+      echo $data[$choix] . ',';
+    }
+}
+?>
 <!-- *****************************************************Création de la barre de navigation*********************************************************** -->
 <!doctype html>
 <html lang="en">
@@ -59,6 +70,38 @@ if ($data['active'] == 1) {
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark w-100 p-0">
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+        <li class="nav-item active">
+        <a class="nav-link" href="#">Heure de Paris: <?php
+                // Set the new timezone
+                date_default_timezone_set('Europe/Paris');
+                $heure = (date('h:i  '));
+                //$heure = '10:00';
+                echo $heure;
+                if ($heure >= '08:00' and $heure <= '21:00') {
+                    $sqlAdmin = mysqli_query($connexion, "SELECT id,ldr FROM (SELECT id,ldr FROM sensor ORDER BY id DESC LIMIT 1) time ORDER BY id ASC");
+                    while ($data = mysqli_fetch_array($sqlAdmin)) {
+                    $a = $data['ldr'];
+                    }
+                    if ($a < "500") {
+                    ?><img class=img-responsive src="../lune.png" style=width:5%><?php
+
+                    } else {
+                    ?><img class=img-responsive src="../soleil.png" style=width:5%><?php
+                    }
+                    
+
+                   }else {
+                    ?><img class=img-responsive src="../lune.png" style=width:5%><?php
+                   }
+                ?>
+            </a>
+        </li>
+        </ul>
+    </div>
+   </nav>
   </header>
   <div class="container-fluid">
     <div class="row">
@@ -173,6 +216,7 @@ if ($data['active'] == 1) {
               <a href='tableau.php' class='btn btn-sm btn-outline-secondary'>Home</a>
               <a href='alldata.php' class='btn btn-sm btn-outline-secondary'>All data</a>
               <a href='multichart.php' class='btn btn-sm btn-outline-secondary'>Multi Chart</a>
+              <a class='btn btn-sm btn-outline-secondary' id="smooth">Smooth Chart</a>
               <div class="btn-group" role="group">
                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                   Select data sensor
@@ -221,33 +265,104 @@ if ($data['active'] == 1) {
           <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.1.1/chartjs-plugin-zoom.min.js" integrity="sha512-NxlWEbNbTV6acWnTsWRLIiwzOw0IwHQOYUCKBiu/NqZ+5jSy7gjMbpYI+/4KvaNuZ1qolbw+Vnd76pbIUYEG8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
           <canvas id="myChart" width="900" height="380"></canvas>
           <script>
+            let smooth = false;
+            const actions = [
+              {
+                handler(chart1) {
+                  smooth = !smooth;
+                  chart1.options.elements.line.tension = smooth ? 0.4 : 0;
+                  chart1.update();
+                }
+              }
+            ];
+            actions.forEach((a, i) => {
+            const smooth = document.getElementById('smooth');
+            smooth.onclick = () => a.handler(myChart);
+            });
             const labels = [<?php while ($data = mysqli_fetch_array($sqlAdmin)) {
                               echo '"' . $data['time'] . '",';
                             } ?>];
             const data = {
               labels: labels,
               datasets: [{
-                label: 'All data Temperature DHT',
+                label: 'Temperature DHT',
                 backgroundColor: [
-                            'rgba(0,123,255, .2)',
+                            'rgba(255,0,0, .2)',
                           ],
                           borderColor: [
-                            'rgba(54, 162, 235, 1)',],
-                <?php
-                if (isset($_GET['sdate']) || isset($_GET['edate'])) {
-
-                  $sdate = $_GET['sdate'];
-                  $edate = $_GET['edate'];
-                  $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol FROM sensor WHERE time BETWEEN ' $sdate ' AND ' $edate ' ORDER BY ID ASC");
-                } else {
-                  $sqlAdmin = mysqli_query($connexion, "SELECT id,time,temp,hum,hc,humsol FROM sensor ORDER BY ID ASC");
-                }
-
-                ?>
-                data: [<?php while ($data = mysqli_fetch_array($sqlAdmin)) {
-                          echo $data['temp'] . ',';
-                        } ?>],
-              }]
+                            'rgba(255, 0, 0, 1)',],
+                data: [<?php filter(temp); ?>],
+              },
+              {
+                label: 'Humidiy DHT',
+                backgroundColor: [
+                            'rgba(0,0,235, .2)',
+                          ],
+                          borderColor: [
+                            'rgba(0, 0, 235, 1)',],
+                data: [<?php filter(hum); ?>],
+                hidden: true
+              },
+              {
+                label: 'Heat Index',
+                backgroundColor: [
+                            'rgba(200,0,255, .2)',
+                          ],
+                          borderColor: [
+                            'rgba(200, 0, 255, 1)',],
+                data: [<?php filter(hc); ?>],
+                hidden: true
+              },
+              {
+                label: 'Soil Moisture Sensor',
+                backgroundColor: [
+                            'rgba(0,128,128, .2)',
+                          ],
+                          borderColor: [
+                            'rgba(0, 128, 128, 1)',],
+                data: [<?php filter(humsol); ?>],
+                hidden: true
+              },
+              {
+                label: 'Temperature Sensor Probe',
+                backgroundColor: [
+                            'rgba(223,109,20, .2)',
+                          ],
+                          borderColor: [
+                            'rgba(223, 109, 20, 1)',],
+                data: [<?php filter(sondetemp); ?>],
+                hidden: true
+              },
+              {
+                label: 'CO2',
+                backgroundColor: [
+                            'rgba(190,190,190, .2)',
+                          ],
+                          borderColor: [
+                            'rgba(190, 190, 190, 1)',],
+                data: [<?php filter(gas); ?>],
+                hidden: true
+              },
+              {
+                label: 'O2',
+                backgroundColor: [
+                            'rgba(204,80,125, .2)',
+                          ],
+                          borderColor: [
+                            'rgba(204, 80, 125, 1)',],
+                data: [<?php filter(gas2); ?>],
+                hidden: true
+              },
+              {
+                label: 'LDR',
+                backgroundColor: [
+                            'rgba(245,205,39, .2)',
+                          ],
+                          borderColor: [
+                            'rgba(245, 205, 39, 1)',],
+                data: [<?php filter(ldr); ?>],
+                hidden: true
+              },]
             };
             const config = {
               type: 'line',

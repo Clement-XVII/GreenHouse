@@ -16,9 +16,9 @@ if (mysqli_num_rows($result) > 0) {
 }
 
 header('Content-Type: text/csv; charset=utf-8');
-header('Content-Disposition: attachment; filename=sensor.csv');
+header('Content-Disposition: attachment; filename=sensors.csv');
 $output = fopen('php://output', 'w');
-fputcsv($output, array('ID', 'Time', 'Temperature °C', 'Humidite %', 'Indice de temperature'));
+fputcsv($output, array('ID', 'Time', 'Temperature °C', 'Humidite %', 'Indice de Temperature', 'Humidite du Sol %', 'Sonde de Temperature °C', 'C02 (ppm)', 'O2 (%)', 'LDR (LUX)'));
 
 if (count($sensor) > 0) {
     foreach ($sensor as $row) {
